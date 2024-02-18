@@ -25,7 +25,6 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     print("reading mesh...")
     
     target_lod = 0  # Target LOD value
-    vertex_size = 0 # Size of vertex in bytes (not consistent between files!)
     
     if file_structure and import_rig:
         skel_path = file_path.replace('data_pc', 'data')
@@ -51,6 +50,23 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
 #        lod0_offset = 
 #        block_offset = 115
 #        vertex_size = 8
+
+#    if "typewriter.binfbx" in file_path:
+#        table_offset = 0x75FB
+#        lod0_offset = 0x28D7CC
+
+    if "subway_train_crush_sim.binfbx" in file_path:
+        table_offset = 0x523DCA
+        lod0_offset = 0x5242EF
+        mesh_skeleton_offset = 0x4AEE7C
+        
+#    if "clicker_a.binfbnx" in file_path:
+#        table_offset = 0xA0
+#        lod0_offset =
+        
+    if "leadpipe_default_publish.binfbx" in file_path:
+        table_offset = 0x353
+        lod0_offset = 0xE685
         
     if "flashbang_default_publish.binfbx" in file_path:
         table_offset = 0x68D
@@ -649,7 +665,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
 
     smax = 1 / 65535
     # Read vertex data for the entire mesh with the corresponding LOD value
-    def read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, meshnum, vertex_size):
+    def read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, meshnum):
         vertArray = []
         lva = []
         # Navigate to the start of the vertex data
@@ -669,7 +685,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
             ly = read_short(file) * smax
             lz = read_short(file) * smax
             lva.append((lx, ly, lz))
-            file.seek(cur_offset + vertex_size, 0)
+            file.seek(cur_offset + mesh_info.vertex_size, 0)
             
             
 #        print(f"min vertex: {minv}")
@@ -732,8 +748,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         return vertArray
 
 
-    def read_mesh_weights(file, mesh_info, skel_info, vertex_offset, vertcount, vertex_size):
+    def read_mesh_weights(file, mesh_info, skel_info, vertex_offset, vertcount):
         file.seek(vertex_offset, 0)
+        print(f"vertex size in weights func: {mesh_info.vertex_size}")
         bdrev = dict((v, k) for k, v in skel_info.bone_dict.items())
         vrts = []
 
@@ -746,9 +763,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                     vweights = []
                     file.seek(cur_offset + 8, 0)
                     for _ in range(mesh_info.bonesPerVertex):
-                        if vertex_size == 32:
+                        if mesh_info.vertex_size == 32:
                             lbid = read_short(file)
-                        elif vertex_size == 16 or vertex_size == 12:
+                        elif mesh_info.vertex_size == 16 or mesh_info.vertex_size == 12:
                             lbid = read_char(file)
                         vbids.append(lbid)
 
@@ -772,7 +789,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                     
                     
 
-            file.seek(cur_offset + vertex_size, 0)
+            file.seek(cur_offset + mesh_info.vertex_size, 0)
 
         print(f"number of weight verts: {len(vrts)}")
         return vrts
@@ -903,14 +920,14 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                             uv_offset = lod0_offset + HEADER_SIZE
                             vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
                             print(f"Vertex Size: {mesh_info.vertex_size}")
-                            submeshvert_offset = vertex_offset + (verts * vertex_size)
+                            submeshvert_offset = vertex_offset + (verts * mesh_info.vertex_size)
                             print(f"Vertex Offset in DEC for Submesh {i} (LOD{mesh_info.lodId}): {submeshvert_offset}")
                             face_offset = vertex_offset + (mesh_info.vertCount * mesh_info.vertex_size) + (mesh_info.face_offset * mesh_info.byteForFace)
                             print(f"Face Offset in DEC for Mesh ID {i} (LOD{mesh_info.lodId}): {face_offset}")
                             
                             UV_array = read_mesh_uvs(file, mesh_info, uv_offset)
                             faceArray, minv, maxv = read_mesh_faces(file, mesh_info, face_offset)
-                            vertArray = read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, i - 1, mesh_info.vertex_size)
+                            vertArray = read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, i - 1)
                             if len(faceArray) != mesh_info.faceCount:
                                 print(f"Warning: Number of faces loaded ({len(faceArray)}) does not match expected number ({mesh_info.faceCount}) agree!")
                         
@@ -920,7 +937,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                             vertcount = len(objArray[msh].data.vertices)
                             verts += vertcount
                             print(f"number of verts for submesh {msh}: {vertcount}")
-                            vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount, mesh_info.vertex_size)
+                            vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount)
                             
                             # assigning weight groups
                             if import_rig:
