@@ -21,7 +21,7 @@ icons_dir = os.path.join(os.path.dirname(__file__), "icons")
 custom_icon_col = {}
 
 
-def import_binfbx(context, file_path, import_rig, file_structure):
+def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     print("reading mesh...")
     
     target_lod = 0  # Target LOD value
@@ -35,9 +35,8 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 
     # Define offset values based on filename
     mltMsh = 5
-    mesh_skel_offset = 0x10
+    mesh_skeleton_offset = 0x10
     table_offset = 0
-    block_offset = 0
     lod0_offset = 0
 
     # Check the file name and assign offset values
@@ -46,493 +45,340 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 #        lod0_offset = 0x28D7CC
 #        block_offset = 119
 #        vertex_size = 12
-
+    
+#    if "plaza_alice_wake_statue_a.binfbx" in file_path:
+#        table_offset = 0xF0
+#        lod0_offset = 
+#        block_offset = 115
+#        vertex_size = 8
+        
     if "flashbang_default_publish.binfbx" in file_path:
         table_offset = 0x68D
         lod0_offset = 0x70C
-        block_offset = 119
-        vertex_size = 12
         
     if "casey_pistol_default_publish.binfbx" in file_path:
         table_offset = 0xB09
         lod0_offset = 0xB8C
-        block_offset = 123
-        vertex_size = 16
         
     if "crossbow_default_publish.binfbx" in file_path:
         table_offset = 0x1D86
         lod0_offset = 0x1FF5
-        block_offset = 123
-        vertex_size = 16
 
     if "crossbow_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2CFC
         lod0_offset = 0x2F6B
-        block_offset = 123
-        vertex_size = 16
 
     if "doublebarrelshotgun_default_publish.binfbx" in file_path:
         table_offset = 0x1478
         lod0_offset = 0x1576
-        block_offset = 123
-        vertex_size = 16
 
     if "fbiservicepistol_compensator_publish.binfbx" in file_path:
         table_offset = 0x573
         lod0_offset = 0x5F2
-        block_offset = 119
-        vertex_size = 12
 
     if "fbiservicepistol_default_publish.binfbx" in file_path:
         table_offset = 0xD12
         lod0_offset = 0xE10
-        block_offset = 123
-        vertex_size = 16
 
     if "fbiservicepistol_magazine_extended_publish.binfbx" in file_path:
         table_offset = 0x613
         lod0_offset = 0x709
-        block_offset = 119
-        vertex_size = 12
 
     if "flaregun_default_publish.binfbx" in file_path:
         table_offset = 0x6ED
         lod0_offset = 0x76C
-        block_offset = 119
-        vertex_size = 12
 
     if "flashlight_default_publish.binfbx" in file_path:
         table_offset = 0x1920D
         lod0_offset = 0x193F1
-        block_offset = 119
-        vertex_size = 12
+        mesh_skeleton_offset = 0x18C4C
 
     if "lamp_default_publish.binfbx" in file_path:
         table_offset = 0x40E
         lod0_offset = 0x5F2
-        block_offset = 119
-        vertex_size = 12
 
     if "lamp_physx.binfbx" in file_path:
         table_offset = 0x94A
         lod0_offset = 0xB3E
-        block_offset = 123
-        vertex_size = 16
 
     if "pumpactionshotgun_compensator_publish.binfbx" in file_path:
         table_offset = 0x96C
         lod0_offset = 0x9EB
-        block_offset = 119
-        vertex_size = 12
 
     if "pumpactionshotgun_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2442
         lod0_offset = 0x25BB
-        block_offset = 123
-        vertex_size = 16
 
     if "pumpactionshotgun_stock_pouch_publish.binfbx" in file_path:
         table_offset = 0x8A4
         lod0_offset = 0x923
-        block_offset = 119
-        vertex_size = 12
 
     if "revolver_default_publish.binfbx" in file_path:
         table_offset = 0x1517
         lod0_offset = 0x160D
-        block_offset = 119
-        vertex_size = 12
 
     if "rifle_cheek_pad_publish.binfbx" in file_path:
         table_offset = 0xF75
         lod0_offset = 0x1073
-        block_offset = 123
-        vertex_size = 16
 
     if "rifle_default_publish.binfbx" in file_path:
         table_offset = 0x1536
         lod0_offset = 0x1634
-        block_offset = 123
-        vertex_size = 16
 
     if "rifle_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2471
         lod0_offset = 0x256F
-        block_offset = 123
-        vertex_size = 16
 
     if "rifle_scope_publish.binfbx" in file_path:
         table_offset = 0xF75
         lod0_offset = 0x106B
-        block_offset = 119
-        vertex_size = 12
 
     if "sawnoffshotgun_default_publish.binfbx" in file_path:
         table_offset = 0x1514
         lod0_offset = 0x1612
-        block_offset = 123
-        vertex_size = 16
 
     if "sawnoffshotgun_physx.binfbx" in file_path:
         table_offset = 0x260B
         lod0_offset = 0x2709
-        block_offset = 123
-        vertex_size = 16
 
     if "abigail_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2efe6
         lod0_offset = 0xb30aae
-        block_offset = 127
-        vertex_size = 32
 
     if "ahti_default_publish_physx.binfbx" in file_path:
         table_offset = 0x379ef
         lod0_offset = 0x5cb9dd
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_brightfalls_noplaid_publish_physx.binfbx" in file_path:
         table_offset = 0x253f9
         lod0_offset = 0x20df985
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_brightfalls_publish_physx.binfbx" in file_path:
         table_offset = 0x303f2
         lod0_offset = 0x218e521
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_default_dirty_01_publish_physx.binfbx" in file_path:
         table_offset = 0x2f5ff
         lod0_offset = 0x2356e64
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_default_dirty_02_no_satchel_publish_physx.binfbx" in file_path:
         table_offset = 0x33bde
         lod0_offset = 0x10188b4
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_default_dirty_02_publish_physx.binfbx" in file_path:
         table_offset = 0x351a5
         lod0_offset = 0x10da56d
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2f5f3
         lod0_offset = 0x232566a
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_no_satchel_publish_physx.binfbx" in file_path:
         table_offset = 0x2e028
         lod0_offset = 0x2288458
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_scratch_player_publish_physx.binfbx" in file_path:
         table_offset = 0x2efcc
         lod0_offset = 0x81A524
-        block_offset = 127
-        vertex_size = 32
 
     if "alan_wake_scratch_publish_physx.binfbx" in file_path:
         table_offset = 0x6a541f
         lod0_offset = 0x24ea0b5
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x678968
 
     if "alex_casey_dark_place_publish_physx.binfbx" in file_path:
         table_offset = 0x2c6f4
         lod0_offset = 0x1b6307e
-        block_offset = 127
-        vertex_size = 32
 
     if "alex_casey_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2d08d
         lod0_offset = 0x1eccaa0
-        block_offset = 127
-        vertex_size = 32
 
     if "alex_casey_suit_publish.binfbx" in file_path:
         table_offset = 0x22e5f
         lod0_offset = 0x1B59BE2
-        block_offset = 127
-        vertex_size = 32
 
     if "alex_casey_suit_rough_publish_physx.binfbx" in file_path:
         table_offset = 0x26f90
         lod0_offset = 0x628DAC
-        block_offset = 127
-        vertex_size = 32
 
     if "charlie_koskela_mascot_publish_physx.binfbx" in file_path:
         table_offset = 0x223c2
         lod0_offset = 0x2aae00
-        block_offset = 127
-        vertex_size = 32
 
     if "charline_koskela_mascot_publish_physx.binfbx" in file_path:
         table_offset = 0x226c3
         lod0_offset = 0x2955a9
-        block_offset = 127
-        vertex_size = 32
 
     if "cynthia_weaver_dead_publish_physx.binfbx" in file_path:
         table_offset = 0x440ab
         lod0_offset = 0xf0d180
-        block_offset = 127
-        vertex_size = 32
 
     if "cynthia_weaver_sweater_publish_physx.binfbx" in file_path:
         table_offset = 0x2e966
         lod0_offset = 0xbd7938
-        block_offset = 127
-        vertex_size = 32
 
     if "deputy_mulligan_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x26411
         lod0_offset = 0xbc6e74
-        block_offset = 127
-        vertex_size = 32
 
     if "deputy_mulligan_default_publish_physx.binfbx" in file_path:
         table_offset = 0x26ade
         lod0_offset = 0xb64576
-        block_offset = 127
-        vertex_size = 32
 
     if "deputy_mulligan_guardian_publish_physx.binfbx" in file_path:
         table_offset = 0x237e7
         lod0_offset = 0xf45a19
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x539e70
 
     if "deputy_thorton_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x2b112
         lod0_offset = 0x1039915
-        block_offset = 127
-        vertex_size = 32
 
     if "deputy_thorton_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2b24d
         lod0_offset = 0xf9f308
-        block_offset = 127
-        vertex_size = 32
 
     if "deputy_thorton_guardian_publish_physx.binfbx" in file_path:
         table_offset = 0x569ddc
         lod0_offset = 0x1920a21
-        block_offset = 127
-        vertex_size = 32
 
     if "donna_default_publish_physx.binfbx" in file_path:
         table_offset = 0x241a8
         lod0_offset = 0xa42115
-        block_offset = 127
-        vertex_size = 32
 
     if "ed_booker_deerfest_publish_physx.binfbx" in file_path:
         table_offset = 0x2cfb2
         lod0_offset = 0x74ff4b
-        block_offset = 127
-        vertex_size = 32
 
     if "ed_booker_default_publish_physx.binfbx" in file_path:
         table_offset = 0x42c370
         lod0_offset = 0xa9b16a
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x3ff308
 
     if "ilmo_koskela_bikergang_publish_physx.binfbx" in file_path:
         table_offset = 0x2594e
         lod0_offset = 0x68d545
-        block_offset = 127
-        vertex_size = 32
 
     if "ilmo_koskela_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x3ba099
         lod0_offset = 0xafa914
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x3911a0
 
     if "ilmo_koskela_deerfest_publish_physx.binfbx" in file_path:
         table_offset = 0x25801
         lod0_offset = 0x9e9c96
-        block_offset = 127
-        vertex_size = 32
 
     if "jaakko_koskela_bikergang_publish_physx.binfbx" in file_path:
         table_offset = 0x2f92b
         lod0_offset = 0xd1080f
-        block_offset = 127
-        vertex_size = 32
 
     if "jaakko_koskela_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x454c4e
         lod0_offset = 0x10076b9
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x42b998
 
     if "kiran_estevez_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2ab4c
         lod0_offset = 0x97e866
-        block_offset = 127
-        vertex_size = 32
 
     if "kiran_estevez_healed_publish.binfbx" in file_path:
         table_offset = 0x254d7
         lod0_offset = 0x970eaf
-        block_offset = 127
-        vertex_size = 32
 
     if "kiran_estevez_wounded_jacket_publish_physx.binfbx" in file_path:
         table_offset = 0x2ab44
-        lod0_offset = 0x7fb21a - (80470 * 0x28)
-        block_offset = 127
-        vertex_size = 32
+        lod0_offset = 0x4E94AA
 
     if "kiran_estevez_wounded_publish.binfbx" in file_path:
         table_offset = 0x2549f
         lod0_offset = 0x94af5a
-        block_offset = 127
-        vertex_size = 32
 
     if "mandy_may_nursinghome_publish_physx.binfbx" in file_path:
         table_offset = 0x26357
         lod0_offset = 0x9f24d5
-        block_offset = 127
-        vertex_size = 32
         
     if "nightingale_guardian_publish.binfbx" in file_path:
         table_offset = 0x20494
         lod0_offset = 0x101707D
-        block_offset = 127
-        vertex_size = 32
         
     if "norman_deerfest_publish.binfbx" in file_path:
         table_offset = 0x2069d
         lod0_offset = 0x8aa9d7
-        block_offset = 127
-        vertex_size = 32
 
     if "norman_default_publish.binfbx" in file_path:
         table_offset = 0x239d4
         lod0_offset = 0x76fee3
-        block_offset = 127
-        vertex_size = 32
 
     if "odin_default_publish_physx.binfbx" in file_path:
         table_offset = 0x24487
         lod0_offset = 0x87b739
-        block_offset = 127
-        vertex_size = 32
 
     if "odin_rocker_publish_physx.binfbx" in file_path:
         table_offset = 0x296d2
         lod0_offset = 0x8c35c5
-        block_offset = 127
-        vertex_size = 32
 
     if "pat_maine_default_publish.binfbx" in file_path:
         table_offset = 0x23c97
         lod0_offset = 0x828564
-        block_offset = 127
-        vertex_size = 32
 
     if "rose_marigold_default_publish_physx.binfbx" in file_path:
         table_offset = 0x32a33
         lod0_offset = 0xd96181
-        block_offset = 127
-        vertex_size = 32
 
     if "rose_marigold_nursinghome_publish_physx.binfbx" in file_path:
         table_offset = 0x2d0ff
         lod0_offset = 0xd1b5ed
-        block_offset = 127
-        vertex_size = 32
 
     if "saga_alt_publish_physx.binfbx" in file_path:
         table_offset = 0x40ed2
         lod0_offset = 0x19990ED
-        block_offset = 127
-        vertex_size = 32
 
     if "saga_default_publish_physx.binfbx" in file_path:
         table_offset = 0x3e394
         lod0_offset = 0x16E23CC
-        block_offset = 127
-        vertex_size = 32
 
     if "saga_no_jacket_publish_physx.binfbx" in file_path:
         table_offset = 0x34e35
         lod0_offset = 0x18f6e73
-        block_offset = 127
-        vertex_size = 32
 
     if "saga_raincoat_publish_physx.binfbx" in file_path:
         table_offset = 0x40d66
         lod0_offset = 0x158ac0c
-        block_offset = 127
-        vertex_size = 32
 
     if "steven_lin_default_publish.binfbx" in file_path:
         table_offset = 0x24d73
         lod0_offset = 0xb58c24
-        block_offset = 127
-        vertex_size = 32
 
     if "tammy_booker_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x25d85
         lod0_offset = 0x50feb6
-        block_offset = 127
-        vertex_size = 32
 
     if "tammy_booker_default_publish_physx.binfbx" in file_path:
         table_offset = 0x3ebedd
         lod0_offset = 0x8758c7
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x3c6190
 
     if "tim_breaker_darkplace_publish_physx.binfbx" in file_path:
         table_offset = 0x286c3
         lod0_offset = 0xd766e0
-        block_offset = 127
-        vertex_size = 32
 
     if "tim_breaker_sheriff_publish_physx.binfbx" in file_path:
         table_offset = 0x2851d
         lod0_offset = 0xb25aab
-        block_offset = 127
-        vertex_size = 32
 
     if "tor_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2d8be
         lod0_offset = 0xe73bad
-        block_offset = 127
-        vertex_size = 32
 
     if "vladimir_blum_cultist_publish_physx.binfbx" in file_path:
         table_offset = 0x35b527
         lod0_offset = 0x83b7ea
-        block_offset = 127
-        vertex_size = 32
         mesh_skeleton_offset = 0x3330b8
 
     if "vladimir_blum_default_publish_physx.binfbx" in file_path:
         table_offset = 0x243a2
         lod0_offset = 0xaaed1d
-        block_offset = 127
-        vertex_size = 32
 
 
     # Auxiliary functions\
@@ -568,7 +414,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 
     # Mesh info structure
     class MeshInfo:
-        def __init__(self, lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox):
+        def __init__(self, lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox, vertex_size):
             self.lodId = lodId
             self.vertCount = vertCount
             self.faceCount = faceCount
@@ -577,6 +423,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
             self.name = name
             self.bonesPerVertex = bonesPerVertex
             self.bbox = bbox
+            self.vertex_size = vertex_size
             
     class SkelInfo:
         def __init__(self, weightcount, bonecount, bonenames, weightnames,bone_dict):
@@ -590,7 +437,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 
     
     # Read mesh data for mesh info structure
-    def read_mesh_data(file, table_offset, block_offset):
+    def read_mesh_data(file, table_offset):
         mesh_infos = []
         file.seek(table_offset)
         mesh_id = read_long(file)
@@ -610,6 +457,19 @@ def import_binfbx(context, file_path, import_rig, file_structure):
             byteForFace = read_long(file)
             face_offset = read_long(file)
             bonesPerVertex = read_long(file)
+            if bonesPerVertex == 8:
+                block_offset = 127
+                vertex_size = 32
+            elif bonesPerVertex == 4:
+                block_offset = 123
+                vertex_size = 16
+            elif bonesPerVertex == 1:
+                block_offset = 119
+                vertex_size = 12
+            elif bonesPerVertex == 0:
+                block_offset = 115
+                vertex_size = 8
+#            print(f"Vertex Size: {vertex_size}")
             bbox[i] = read_float_array(10, file)
             
             for n in range(10):
@@ -623,7 +483,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
                 file.seek(countBlock * 36, 1)
             else:
                 file.seek(cur_offset + block_offset, 0)
-            mesh_infos.append(MeshInfo(lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox))
+            mesh_infos.append(MeshInfo(lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox, vertex_size))
 
         
         return mesh_infos
@@ -636,7 +496,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 
     def read_skel_data(skel, mesh):
         skel_infos = []
-        mesh.seek(mesh_skel_offset)
+        mesh.seek(mesh_skeleton_offset)
         skel.seek(0x30, 0)
         weightcount = read_long(mesh)
         bonecount = read_long(skel)
@@ -789,7 +649,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 
     smax = 1 / 65535
     # Read vertex data for the entire mesh with the corresponding LOD value
-    def read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, meshnum):
+    def read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, meshnum, vertex_size):
         vertArray = []
         lva = []
         # Navigate to the start of the vertex data
@@ -872,7 +732,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
         return vertArray
 
 
-    def read_mesh_weights(file, mesh_info, skel_info, vertex_offset, vertcount):
+    def read_mesh_weights(file, mesh_info, skel_info, vertex_offset, vertcount, vertex_size):
         file.seek(vertex_offset, 0)
         bdrev = dict((v, k) for k, v in skel_info.bone_dict.items())
         vrts = []
@@ -1022,7 +882,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
         verts = 0
         with open(file_path, "rb") as file:     
             with open(skel_path, "rb") as skel:  
-                mesh_infos = read_mesh_data(file, table_offset, block_offset)
+                mesh_infos = read_mesh_data(file, table_offset)
                 skel_infos = read_skel_data(skel, file)
                 print_mesh_infos(mesh_infos)
     
@@ -1042,14 +902,15 @@ def import_binfbx(context, file_path, import_rig, file_structure):
 #                            for n in range(i)
                             uv_offset = lod0_offset + HEADER_SIZE
                             vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
+                            print(f"Vertex Size: {mesh_info.vertex_size}")
                             submeshvert_offset = vertex_offset + (verts * vertex_size)
                             print(f"Vertex Offset in DEC for Submesh {i} (LOD{mesh_info.lodId}): {submeshvert_offset}")
-                            face_offset = vertex_offset + (mesh_info.vertCount * vertex_size) + (mesh_info.face_offset * mesh_info.byteForFace)
+                            face_offset = vertex_offset + (mesh_info.vertCount * mesh_info.vertex_size) + (mesh_info.face_offset * mesh_info.byteForFace)
                             print(f"Face Offset in DEC for Mesh ID {i} (LOD{mesh_info.lodId}): {face_offset}")
                             
                             UV_array = read_mesh_uvs(file, mesh_info, uv_offset)
                             faceArray, minv, maxv = read_mesh_faces(file, mesh_info, face_offset)
-                            vertArray = read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, i - 1)
+                            vertArray = read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, i - 1, mesh_info.vertex_size)
                             if len(faceArray) != mesh_info.faceCount:
                                 print(f"Warning: Number of faces loaded ({len(faceArray)}) does not match expected number ({mesh_info.faceCount}) agree!")
                         
@@ -1059,7 +920,7 @@ def import_binfbx(context, file_path, import_rig, file_structure):
                             vertcount = len(objArray[msh].data.vertices)
                             verts += vertcount
                             print(f"number of verts for submesh {msh}: {vertcount}")
-                            vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount)
+                            vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount, mesh_info.vertex_size)
                             
                             # assigning weight groups
                             if import_rig:
@@ -1080,10 +941,11 @@ def import_binfbx(context, file_path, import_rig, file_structure):
                                     grp.add([vrt],
                                     wgt[vrt][1], 
                                     'ADD')
-                                bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
-                                bpy.ops.active_object = obj
-                                bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=0.51, repeat=5, expand=0.0)
-                                bpy.ops.object.mode_set(mode='OBJECT')
+                                if smooth:
+                                    bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
+                                    bpy.ops.active_object = obj
+                                    bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=0.5, repeat=2, expand=0.0)
+                                    bpy.ops.object.mode_set(mode='OBJECT')
                                     
                                 
                                 
@@ -1145,10 +1007,14 @@ class read_binfbx(Operator, ImportHelper):
         description="When enabled, looks for the binskeleton file in /data/objects/. If disabled, looks for the skeleton file next to the mesh file",
         default=True,
     )
-
+    smooth: BoolProperty(
+        name="Smooth Weights",
+        description="Whether or not to 'smooth' the imported vertex groups, giving them a cleaner and smoother deform.",
+        default=True,
+    )
     def execute(self, context):
         print("file path:", self.filepath)
-        return import_binfbx(context, self.filepath, self.import_rig)
+        return import_binfbx(context, self.filepath, self.import_rig, self.file_structure, self.smooth)
 
 
 # Only needed if you want to add into a dynamic menu.
