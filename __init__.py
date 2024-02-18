@@ -945,8 +945,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                                     bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
                                     bpy.ops.active_object = obj
                                     bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=0.5, repeat=2, expand=0.0)
-                                    bpy.ops.object.mode_set(mode='OBJECT')
-                                    
+                                    bpy.ops.object.mode_set(mode='EDIT')
+                                    bpy.ops.mesh.remove_doubles(use_unselected=True, use_sharp_edge_from_normals=True)
+                                    bpy.ops.object.mode_set(mode='OBJECT')                                    
                                 
                                 
                                 
