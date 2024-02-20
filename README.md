@@ -3,7 +3,7 @@
  
 Should work with Blender 3.5+, any version before is unaccounted for on whether it works or not.   
 Special thanks to;   
-Cheturbator - binskeleton reversing, general python help  
+Cheturbator - binskeleton reversing, binfbx reversing, general python help  
 Volfix - writing the control binfbx addon, used for some important pointers on mesh handling  
 Mike2023 on ResHax - writing the original blender script  
 DKDave on ResHax - binfbx format reversing  
