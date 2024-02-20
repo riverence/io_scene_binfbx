@@ -87,7 +87,11 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     if "crossbow_default_publish_physx.binfbx" in file_path:
         table_offset = 0x2CFC
         lod0_offset = 0x2F6B
-
+        
+    if "crossbow_double_publish_physx.binfbx" in file_path:
+        table_offset = 0x41B1
+        lod0_offset = 0x149E93
+        
     if "doublebarrelshotgun_default_publish.binfbx" in file_path:
         table_offset = 0x1478
         lod0_offset = 0x1576
@@ -970,8 +974,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                                     bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
                                     bpy.ops.active_object = obj
                                     bpy.ops.object.vertex_group_smooth(group_select_mode='ALL', factor=0.5, repeat=2, expand=0.0)
-                                    bpy.ops.object.mode_set(mode='EDIT')
-                                    bpy.ops.mesh.remove_doubles(use_unselected=True, use_sharp_edge_from_normals=True)
+                                    if mesh_info.vertex_size == 32:
+                                        bpy.ops.object.mode_set(mode='EDIT')
+                                        bpy.ops.mesh.remove_doubles(use_unselected=True, use_sharp_edge_from_normals=True)
                                     bpy.ops.object.mode_set(mode='OBJECT')                                    
                                 
                                 
