@@ -60,6 +60,10 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         lod0_offset = 0x5242EF
         mesh_skeleton_offset = 0x4AEE7C
         
+    if "dark_presence_intro_paper_simulation.binfbx" in file_path:
+        table_offset = 0x5D8D1
+        lod0_offset = 0
+        
 #    if "clicker_a.binfbnx" in file_path:
 #        table_offset = 0xA0
 #        lod0_offset =
@@ -271,7 +275,11 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         table_offset = 0x42c370
         lod0_offset = 0xa9b16a
         mesh_skeleton_offset = 0x3ff308
-
+        
+    if "enemy_m_fadeout_01_publish.binfbx" in file_path:
+        table_offset = 0x1F9C9
+        lod0_offset = 0x3034C9
+        
     if "ilmo_koskela_bikergang_publish_physx.binfbx" in file_path:
         table_offset = 0x2594e
         lod0_offset = 0x68d545
