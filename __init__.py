@@ -60,9 +60,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         lod0_offset = 0x5242EF
         mesh_skeleton_offset = 0x4AEE7C
         
-    if "dark_presence_intro_paper_simulation.binfbx" in file_path:
-        table_offset = 0x5D8D1
-        lod0_offset = 0
+#    if "dark_presence_intro_paper_simulation.binfbx" in file_path:
+#        table_offset = 0x5D8D1
+#        lod0_offset = 0
         
 #    if "clicker_a.binfbnx" in file_path:
 #        table_offset = 0xA0
@@ -677,13 +677,12 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
 
     smax = 1 / 65535
     # Read vertex data for the entire mesh with the corresponding LOD value
-    def read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, meshnum):
+    def read_mesh_vertices(file, mesh_info, vertex_offset, minv, maxv, meshnum):
         vertArray = []
         lva = []
         # Navigate to the start of the vertex data
         file.seek(vertex_offset)
         vertCount = mesh_info.vertCount
-        bdrev = dict((v, k) for k, v in skel_info.bone_dict.items())
         xMin = 9000000
         yMin = 9000000
         zMin = 9000000
@@ -855,6 +854,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         bpy.data.collections[name].objects.link(mesh_obj)
         bpy.context.view_layer.objects.active = mesh_obj
         mesh_obj.select_set(True)
+        if not import_rig:
+            bpy.context.active_object.rotation_euler[0] = math.radians(90)
+        
 
         # Assign mesh data
         mesh_data.from_pydata(vertArray, [], faceArray)
@@ -910,51 +912,53 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         msh = -1
         verts = 0
         with open(file_path, "rb") as file:     
-            with open(skel_path, "rb") as skel:  
-                mesh_infos = read_mesh_data(file, table_offset)
-                skel_infos = read_skel_data(skel, file)
-                print_mesh_infos(mesh_infos)
-    
-                for mesh_info in mesh_infos:
-                    collection_name = mesh_info.name
-                    
-                    # check if the collection already exists
-                    if collection_name not in bpy.data.collections:
-                        bpy.ops.collection.create(name=collection_name)
-                        bpy.context.scene.collection.children.link(bpy.data.collections[collection_name])
-                    
-                for _, skel_info in enumerate(skel_infos, start=1):
-                    for i, mesh_info in enumerate(mesh_infos, start=1):
-                        if mesh_info.lodId == target_lod:
-                            msh += 1
-                            vrtwgt = None
+            mesh_infos = read_mesh_data(file, table_offset)
+            print_mesh_infos(mesh_infos)
+
+            for mesh_info in mesh_infos:
+                collection_name = mesh_info.name
+                
+                # check if the collection already exists
+                if collection_name not in bpy.data.collections:
+                    bpy.ops.collection.create(name=collection_name)
+                    bpy.context.scene.collection.children.link(bpy.data.collections[collection_name])
+            if import_rig:    
+                with open(skel_path, "rb") as skel:     
+                    print("reading skel...")
+                    skel_infos = read_skel_data(skel, file)
+                    print_skel_infos(skel_infos)
+            for i, mesh_info in enumerate(mesh_infos, start=1):
+                if mesh_info.lodId == target_lod:
+                    msh += 1
+                    vrtwgt = None
 #                            for n in range(i)
-                            uv_offset = lod0_offset + HEADER_SIZE
-                            vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
-                            print(f"Vertex Size: {mesh_info.vertex_size}")
-                            submeshvert_offset = vertex_offset + (verts * mesh_info.vertex_size)
-                            print(f"Vertex Offset in DEC for Submesh {i} (LOD{mesh_info.lodId}): {submeshvert_offset}")
-                            face_offset = vertex_offset + (mesh_info.vertCount * mesh_info.vertex_size) + (mesh_info.face_offset * mesh_info.byteForFace)
-                            print(f"Face Offset in DEC for Mesh ID {i} (LOD{mesh_info.lodId}): {face_offset}")
-                            
-                            UV_array = read_mesh_uvs(file, mesh_info, uv_offset)
-                            faceArray, minv, maxv = read_mesh_faces(file, mesh_info, face_offset)
-                            vertArray = read_mesh_vertices(file, mesh_info, skel_info, vertex_offset, minv, maxv, i - 1)
-                            if len(faceArray) != mesh_info.faceCount:
-                                print(f"Warning: Number of faces loaded ({len(faceArray)}) does not match expected number ({mesh_info.faceCount}) agree!")
-                        
-                            mesh_name = f"{mesh_info.name}_LOD{mesh_info.lodId}__ID_{i}"
-                            objArray = create_mesh_in_blender(vertArray, faceArray, UV_array, mesh_name, mesh_info.name, objArray)
-                            print(f"submesh number {msh}")
-                            vertcount = len(objArray[msh].data.vertices)
-                            verts += vertcount
-                            print(f"number of verts for submesh {msh}: {vertcount}")
-                            vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount)
-                            
+                    uv_offset = lod0_offset + HEADER_SIZE
+                    vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
+                    print(f"Vertex Size: {mesh_info.vertex_size}")
+                    submeshvert_offset = vertex_offset + (verts * mesh_info.vertex_size)
+                    print(f"Vertex Offset in DEC for Submesh {i} (LOD{mesh_info.lodId}): {submeshvert_offset}")
+                    face_offset = vertex_offset + (mesh_info.vertCount * mesh_info.vertex_size) + (mesh_info.face_offset * mesh_info.byteForFace)
+                    print(f"Face Offset in DEC for Mesh ID {i} (LOD{mesh_info.lodId}): {face_offset}")
+                    
+                    UV_array = read_mesh_uvs(file, mesh_info, uv_offset)
+                    faceArray, minv, maxv = read_mesh_faces(file, mesh_info, face_offset)
+                    vertArray = read_mesh_vertices(file, mesh_info, vertex_offset, minv, maxv, i - 1)
+                    if len(faceArray) != mesh_info.faceCount:
+                        print(f"Warning: Number of faces loaded ({len(faceArray)}) does not match expected number ({mesh_info.faceCount}) agree!")
+                
+                    mesh_name = f"{mesh_info.name}_LOD{mesh_info.lodId}__ID_{i}"
+                    objArray = create_mesh_in_blender(vertArray, faceArray, UV_array, mesh_name, mesh_info.name, objArray)
+                    print(f"submesh number {msh}")
+                    vertcount = len(objArray[msh].data.vertices)
+                    verts += vertcount
+                    print(f"number of verts for submesh {msh}: {vertcount}")
+                    obj = objArray[msh]
+                    if import_rig:    
+                        with open(skel_path, "rb") as skel:     
                             # assigning weight groups
-                            if import_rig:
-                                obj = objArray[msh]
-                                for vrt in range(vertcount):
+                            for _, skel_info in enumerate(skel_infos, start=1):
+                                vrtwgt = read_mesh_weights(file, mesh_info, skel_info, submeshvert_offset, vertcount)
+                                for vrt in range(vertcount):   
                                     wgt = vrtwgt
                                     boneid = wgt[vrt][0]
                                     bonename = skel_info.bone_dict[boneid]
@@ -977,25 +981,24 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                                     if mesh_info.vertex_size == 32:
                                         bpy.ops.object.mode_set(mode='EDIT')
                                         bpy.ops.mesh.remove_doubles(use_unselected=True, use_sharp_edge_from_normals=True)
-                                    bpy.ops.object.mode_set(mode='OBJECT')                                    
-                                
-                                
-                                
-                                
-                            
-    
-                            if i+1 < len(mesh_infos) and mesh_info.lodId != mesh_infos[i+1].lodId:
-                                print("Move to next LOD or additional processing")
+                                    bpy.ops.object.mode_set(mode='OBJECT')                         
+                        
+                        
+                        
+                        
+                    
 
-                            elif i+1 == len(mesh_infos):
-                                print("Last mesh reached, additional processing or move on to the next block")
+                    if i+1 < len(mesh_infos) and mesh_info.lodId != mesh_infos[i+1].lodId:
+                        print("Move to next LOD or additional processing")
+
+                    elif i+1 == len(mesh_infos):
+                        print("Last mesh reached, additional processing or move on to the next block")
                     
-                    
-                    
-#                    if import_rig:         
-                    print("reading skel...")
-                    print_skel_infos(skel_infos)
-                    read_mesh_skel(skel, file, skel_info, collection_name, objArray)
+            if import_rig:    
+                with open(skel_path, "rb") as skel:     
+                    for _, skel_info in enumerate(skel_infos, start=1):
+                        print("creating armature...")
+                        read_mesh_skel(skel, file, skel_info, collection_name, objArray)
 #                        print(weightArray)
                                     
                                     
