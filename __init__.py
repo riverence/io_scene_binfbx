@@ -107,7 +107,11 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     if "fbiservicepistol_magazine_extended_publish.binfbx" in file_path:
         table_offset = 0x613
         lod0_offset = 0x709
-
+    
+    if "flare_default_publish.binfbx" in file_path:
+        table_offset = 0x4DE
+        lod0_offset = 0x561
+        
     if "flaregun_default_publish.binfbx" in file_path:
         table_offset = 0x6ED
         lod0_offset = 0x76C
@@ -124,7 +128,11 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     if "lamp_physx.binfbx" in file_path:
         table_offset = 0x94A
         lod0_offset = 0xB3E
-
+        
+    if "nightingale_treeweapon.binfbx" in file_path:
+        table_offset = 0x426
+        lod0_offset = 0x82CB4
+        
     if "pumpactionshotgun_compensator_publish.binfbx" in file_path:
         table_offset = 0x96C
         lod0_offset = 0x9EB
