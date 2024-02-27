@@ -490,6 +490,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
 
 
     def find_offset(file):
+        lod_offsets = dict()
         byte_sequence_1 = b"\x00\x01\x0F\x01\x00\x01\x07\x02"
         total_entries = 0
         
@@ -522,9 +523,10 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         if total_entries == 0:
             print("\nByte sequence not found.")
         table_offset = offset_84
-        lod = 0
-        mesh_infos = read_mesh_data(file, table_offset)
-        lod = mesh_infos[0].lodId - 1
+        mesh_infos, cur_offset = read_mesh_data(file, table_offset)
+        
+        lod_offset = cur_offset + 4
+        lod = mesh_infos[0].lodId
         # Search function for the second byte sequence
         byte_sequence_2 = b"\x00\x00\x00\x02\x00\x00\x00"
         consecutive_bytes = 12
@@ -536,15 +538,24 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
             # Check the following bytes
             consecutive_values = byte_data[index + len(byte_sequence_2):index + len(byte_sequence_2) + consecutive_bytes]
             if not any(byte == 0 for byte in consecutive_values):
-                offset_shifted = index + offset_shift
-                print(f"lod{lod}_offset: {hex(offset_shifted)}")
-                lod -= 1
+                if lod != mesh_infos[0].lodId and lod >= 0:
+                    offset_shifted = index + offset_shift
+                    print(f"lod{lod}_offset: {hex(offset_shifted)}")
+                    lod_offsets[lod] = offset_shifted
+                    lod -= 1
+                if lod == mesh_infos[0].lodId:
+                    print(f"lod{lod}_offset: {hex(lod_offset)}")
+                    lod_offsets[lod] = lod_offset
+                    lod -= 1
             
             # Search for the next occurrence of the byte sequence
             index = byte_data.find(byte_sequence_2, index + 1)
     
         if index == -1:
             print("\nByte sequence not found.")
+            
+        print(f"LOD Offsets: {lod_offsets}")
+        return mesh_infos, lod_offsets
             
     # Read mesh data for mesh info structure
     def read_mesh_data(file, table_offset):
@@ -594,9 +605,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
             else:
                 file.seek(cur_offset + block_offset, 0)
             mesh_infos.append(MeshInfo(lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox, vertex_size))
-
         
-        return mesh_infos
+        cur_offset = file.tell()
+        return mesh_infos, cur_offset
 
     # Function for outputting mesh info structure (console)
     def print_mesh_infos(mesh_infos):
@@ -994,8 +1005,8 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         msh = -1
         verts = 0
         with open(file_path, "rb") as file:     
-            find_offset(file)
-            mesh_infos = read_mesh_data(file, table_offset)
+            mesh_infos, lod_offsets = find_offset(file)
+            lod_offset = lod_offsets[target_lod]
             print_mesh_infos(mesh_infos)
 
             for mesh_info in mesh_infos:
@@ -1015,7 +1026,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                     msh += 1
                     vrtwgt = None
 #                            for n in range(i)
-                    uv_offset = lod0_offset + HEADER_SIZE
+                    uv_offset = lod_offset + HEADER_SIZE
                     vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
                     print(f"Vertex Size: {mesh_info.vertex_size}")
                     submeshvert_offset = vertex_offset + (verts * mesh_info.vertex_size)
