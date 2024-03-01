@@ -19,11 +19,12 @@ import sys
 
 icons_dir = os.path.join(os.path.dirname(__file__), "icons")
 custom_icon_col = {}
-    
+
+
 def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     print("reading mesh...")
     
-    target_lod = 5  # Target LOD value
+    target_lod = 0  # Target LOD value
     
     if file_structure and import_rig:
         skel_path = file_path.replace('data_pc', 'data')
@@ -32,389 +33,388 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         skel_path = file_path.replace('.binfbx', '.binskeleton')
 
     # Define offset values based on filename
-    MAGIC_SIG = 0x4C
     mltMsh = 5
     mesh_skeleton_offset = 0x10
-#    table_offset = 0
-#    lod0_offset = 0
-
-#    # Check the file name and assign offset values
-##    if "typewriter.binfbx" in file_path:
-##        table_offset = 0x75FB
-##        lod0_offset = 0x28D7CC
-##        block_offset = 119
-##        vertex_size = 12
-#    
-##    if "plaza_alice_wake_statue_a.binfbx" in file_path:
-##        table_offset = 0xF0
-##        lod0_offset = 
-##        block_offset = 115
-##        vertex_size = 8
-
-##    if "typewriter.binfbx" in file_path:
-##        table_offset = 0x75FB
-##        lod0_offset = 0x28D7CC
-
-#    if "subway_train_crush_sim.binfbx" in file_path:
-#        table_offset = 0x523DCA
-#        lod0_offset = 0x5242EF
-#        mesh_skeleton_offset = 0x4AEE7C
-#        
-##    if "dark_presence_intro_paper_simulation.binfbx" in file_path:
-##        table_offset = 0x5D8D1
-##        lod0_offset = 0
-#        
-##    if "clicker_a.binfbnx" in file_path:
-##        table_offset = 0xA0
-##        lod0_offset =
-#        
-#    if "leadpipe_default_publish.binfbx" in file_path:
-#        table_offset = 0x353
-#        lod0_offset = 0xE685
-#        
-#    if "flashbang_default_publish.binfbx" in file_path:
-#        table_offset = 0x68D
-#        lod0_offset = 0x70C
-#        
-#    if "casey_pistol_default_publish.binfbx" in file_path:
-#        table_offset = 0xB09
-#        lod0_offset = 0xB8C
-#        
-#    if "crossbow_default_publish.binfbx" in file_path:
-#        table_offset = 0x1D86
-#        lod0_offset = 0x1FF5
-
-#    if "crossbow_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2CFC
-#        lod0_offset = 0x2F6B
-#        
-#    if "crossbow_double_publish_physx.binfbx" in file_path:
-#        table_offset = 0x41B1
-#        lod0_offset = 0x149E93
-#        
-#    if "doublebarrelshotgun_default_publish.binfbx" in file_path:
-#        table_offset = 0x1478
-#        lod0_offset = 0x1576
-
-#    if "fbiservicepistol_compensator_publish.binfbx" in file_path:
-#        table_offset = 0x573
-#        lod0_offset = 0x5F2
-
-#    if "fbiservicepistol_default_publish.binfbx" in file_path:
-#        table_offset = 0xD12
-#        lod0_offset = 0xE10
-
-#    if "fbiservicepistol_magazine_extended_publish.binfbx" in file_path:
-#        table_offset = 0x613
-#        lod0_offset = 0x709
-#    
-#    if "flare_default_publish.binfbx" in file_path:
-#        table_offset = 0x4DE
-#        lod0_offset = 0x561
-#        
-#    if "flaregun_default_publish.binfbx" in file_path:
-#        table_offset = 0x6ED
-#        lod0_offset = 0x76C
-
-#    if "flashlight_default_publish.binfbx" in file_path:
-#        table_offset = 0x1920D
-#        lod0_offset = 0x193F1
-#        mesh_skeleton_offset = 0x18C4C
-
-#    if "lamp_default_publish.binfbx" in file_path:
-#        table_offset = 0x40E
-#        lod0_offset = 0x5F2
-
-#    if "lamp_physx.binfbx" in file_path:
-#        table_offset = 0x94A
-#        lod0_offset = 0xB3E
-#        
-#    if "nightingale_treeweapon.binfbx" in file_path:
-#        table_offset = 0x426
-#        lod0_offset = 0x82CB4
-#        
-#    if "pumpactionshotgun_compensator_publish.binfbx" in file_path:
-#        table_offset = 0x96C
-#        lod0_offset = 0x9EB
-
-#    if "pumpactionshotgun_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2442
-#        lod0_offset = 0x25BB
-
-#    if "pumpactionshotgun_stock_pouch_publish.binfbx" in file_path:
-#        table_offset = 0x8A4
-#        lod0_offset = 0x923
-
-#    if "revolver_default_publish.binfbx" in file_path:
-#        table_offset = 0x1517
-#        lod0_offset = 0x160D
-
-#    if "rifle_cheek_pad_publish.binfbx" in file_path:
-#        table_offset = 0xF75
-#        lod0_offset = 0x1073
-
-#    if "rifle_default_publish.binfbx" in file_path:
-#        table_offset = 0x1536
-#        lod0_offset = 0x1634
-
-#    if "rifle_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2471
-#        lod0_offset = 0x256F
-
-#    if "rifle_scope_publish.binfbx" in file_path:
-#        table_offset = 0xF75
-#        lod0_offset = 0x106B
-
-#    if "sawnoffshotgun_default_publish.binfbx" in file_path:
-#        table_offset = 0x1514
-#        lod0_offset = 0x1612
-
-#    if "sawnoffshotgun_physx.binfbx" in file_path:
-#        table_offset = 0x260B
-#        lod0_offset = 0x2709
-
-#    if "abigail_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2efe6
-#        lod0_offset = 0xb30aae
-
-#    if "ahti_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x379ef
-#        lod0_offset = 0x5cb9dd
-
-#    if "alan_brightfalls_noplaid_publish_physx.binfbx" in file_path:
-#        table_offset = 0x253f9
-#        lod0_offset = 0x20df985
-
-#    if "alan_brightfalls_publish_physx.binfbx" in file_path:
-#        table_offset = 0x303f2
-#        lod0_offset = 0x218e521
-
-#    if "alan_default_dirty_01_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2f5ff
-#        lod0_offset = 0x2356e64
-
-#    if "alan_default_dirty_02_no_satchel_publish_physx.binfbx" in file_path:
-#        table_offset = 0x33bde
-#        lod0_offset = 0x10188b4
-
-#    if "alan_default_dirty_02_publish_physx.binfbx" in file_path:
-#        table_offset = 0x351a5
-#        lod0_offset = 0x10da56d
-
-#    if "alan_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2f5f3
-#        lod0_offset = 0x232566a
-
-#    if "alan_no_satchel_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2e028
-#        lod0_offset = 0x2288458
-
-#    if "alan_scratch_player_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2efcc
-#        lod0_offset = 0x81A524
-
-#    if "alan_wake_scratch_publish_physx.binfbx" in file_path:
-#        table_offset = 0x6a541f
-#        lod0_offset = 0x24ea0b5
-#        mesh_skeleton_offset = 0x678968
-
-#    if "alex_casey_dark_place_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2c6f4
-#        lod0_offset = 0x1b6307e
-
-#    if "alex_casey_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2d08d
-#        lod0_offset = 0x1eccaa0
-
-#    if "alex_casey_suit_publish.binfbx" in file_path:
-#        table_offset = 0x22e5f
-#        lod0_offset = 0x1B59BE2
-
-#    if "alex_casey_suit_rough_publish_physx.binfbx" in file_path:
-#        table_offset = 0x26f90
-#        lod0_offset = 0x628DAC
-
-#    if "charlie_koskela_mascot_publish_physx.binfbx" in file_path:
-#        table_offset = 0x223c2
-#        lod0_offset = 0x2aae00
-
-#    if "charline_koskela_mascot_publish_physx.binfbx" in file_path:
-#        table_offset = 0x226c3
-#        lod0_offset = 0x2955a9
-
-#    if "cynthia_weaver_dead_publish_physx.binfbx" in file_path:
-#        table_offset = 0x440ab
-#        lod0_offset = 0xf0d180
-
-#    if "cynthia_weaver_sweater_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2e966
-#        lod0_offset = 0xbd7938
-
-#    if "deputy_mulligan_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x26411
-#        lod0_offset = 0xbc6e74
-
-#    if "deputy_mulligan_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x26ade
-#        lod0_offset = 0xb64576
-
-#    if "deputy_mulligan_guardian_publish_physx.binfbx" in file_path:
-#        table_offset = 0x237e7
-#        lod0_offset = 0xf45a19
-#        mesh_skeleton_offset = 0x539e70
-
-#    if "deputy_thorton_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2b112
-#        lod0_offset = 0x1039915
-
-#    if "deputy_thorton_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2b24d
-#        lod0_offset = 0xf9f308
-
-#    if "deputy_thorton_guardian_publish_physx.binfbx" in file_path:
-#        table_offset = 0x569ddc
-#        lod0_offset = 0x1920a21
-
-#    if "donna_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x241a8
-#        lod0_offset = 0xa42115
-
-#    if "ed_booker_deerfest_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2cfb2
-#        lod0_offset = 0x74ff4b
-
-#    if "ed_booker_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x42c370
-#        lod0_offset = 0xa9b16a
-#        mesh_skeleton_offset = 0x3ff308
-#        
-#    if "enemy_m_fadeout_01_publish.binfbx" in file_path:
-#        table_offset = 0x1F9C9
-#        lod0_offset = 0x3034C9
-#        
-#    if "ilmo_koskela_bikergang_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2594e
-#        lod0_offset = 0x68d545
-
-#    if "ilmo_koskela_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x3ba099
-#        lod0_offset = 0xafa914
-#        mesh_skeleton_offset = 0x3911a0
-
-#    if "ilmo_koskela_deerfest_publish_physx.binfbx" in file_path:
-#        table_offset = 0x25801
-#        lod0_offset = 0x9e9c96
-
-#    if "jaakko_koskela_bikergang_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2f92b
-#        lod0_offset = 0xd1080f
-
-#    if "jaakko_koskela_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x454c4e
-#        lod0_offset = 0x10076b9
-#        mesh_skeleton_offset = 0x42b998
-
-#    if "kiran_estevez_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2ab4c
-#        lod0_offset = 0x97e866
-
-#    if "kiran_estevez_healed_publish.binfbx" in file_path:
-#        table_offset = 0x254d7
-#        lod0_offset = 0x970eaf
-
-#    if "kiran_estevez_wounded_jacket_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2ab44
-#        lod0_offset = 0x4E94AA
-
-#    if "kiran_estevez_wounded_publish.binfbx" in file_path:
-#        table_offset = 0x2549f
-#        lod0_offset = 0x94af5a
-
-#    if "mandy_may_nursinghome_publish_physx.binfbx" in file_path:
-#        table_offset = 0x26357
-#        lod0_offset = 0x9f24d5
-#        
-#    if "nightingale_guardian_publish.binfbx" in file_path:
-#        table_offset = 0x20494
-#        lod0_offset = 0x101707D
-#        
-#    if "norman_deerfest_publish.binfbx" in file_path:
-#        table_offset = 0x2069d
-#        lod0_offset = 0x8aa9d7
-
-#    if "norman_default_publish.binfbx" in file_path:
-#        table_offset = 0x239d4
-#        lod0_offset = 0x76fee3
-
-#    if "odin_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x24487
-#        lod0_offset = 0x87b739
-
-#    if "odin_rocker_publish_physx.binfbx" in file_path:
-#        table_offset = 0x296d2
-#        lod0_offset = 0x8c35c5
-
-#    if "pat_maine_default_publish.binfbx" in file_path:
-#        table_offset = 0x23c97
-#        lod0_offset = 0x828564
-
-#    if "rose_marigold_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x32a33
-#        lod0_offset = 0xd96181
-
-#    if "rose_marigold_nursinghome_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2d0ff
-#        lod0_offset = 0xd1b5ed
-
-#    if "saga_alt_publish_physx.binfbx" in file_path:
-#        table_offset = 0x40ed2
-#        lod0_offset = 0x19990ED
-
-#    if "saga_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x3e394
-#        lod0_offset = 0x16E23CC
-
-#    if "saga_no_jacket_publish_physx.binfbx" in file_path:
-#        table_offset = 0x34e35
-#        lod0_offset = 0x18f6e73
-
-#    if "saga_raincoat_publish_physx.binfbx" in file_path:
-#        table_offset = 0x40d66
-#        lod0_offset = 0x158ac0c
-
-#    if "steven_lin_default_publish.binfbx" in file_path:
-#        table_offset = 0x24d73
-#        lod0_offset = 0xb58c24
-
-#    if "tammy_booker_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x25d85
-#        lod0_offset = 0x50feb6
-
-#    if "tammy_booker_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x3ebedd
-#        lod0_offset = 0x8758c7
-#        mesh_skeleton_offset = 0x3c6190
-
-#    if "tim_breaker_darkplace_publish_physx.binfbx" in file_path:
-#        table_offset = 0x286c3
-#        lod0_offset = 0xd766e0
-
-#    if "tim_breaker_sheriff_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2851d
-#        lod0_offset = 0xb25aab
-
-#    if "tor_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x2d8be
-#        lod0_offset = 0xe73bad
-
-#    if "vladimir_blum_cultist_publish_physx.binfbx" in file_path:
-#        table_offset = 0x35b527
-#        lod0_offset = 0x83b7ea
-#        mesh_skeleton_offset = 0x3330b8
-
-#    if "vladimir_blum_default_publish_physx.binfbx" in file_path:
-#        table_offset = 0x243a2
-#        lod0_offset = 0xaaed1d
+    table_offset = 0
+    lod0_offset = 0
+
+    # Check the file name and assign offset values
+#    if "typewriter.binfbx" in file_path:
+#        table_offset = 0x75FB
+#        lod0_offset = 0x28D7CC
+#        block_offset = 119
+#        vertex_size = 12
+    
+#    if "plaza_alice_wake_statue_a.binfbx" in file_path:
+#        table_offset = 0xF0
+#        lod0_offset = 
+#        block_offset = 115
+#        vertex_size = 8
+
+#    if "typewriter.binfbx" in file_path:
+#        table_offset = 0x75FB
+#        lod0_offset = 0x28D7CC
+
+    if "subway_train_crush_sim.binfbx" in file_path:
+        table_offset = 0x523DCA
+        lod0_offset = 0x5242EF
+        mesh_skeleton_offset = 0x4AEE7C
+        
+#    if "dark_presence_intro_paper_simulation.binfbx" in file_path:
+#        table_offset = 0x5D8D1
+#        lod0_offset = 0
+        
+#    if "clicker_a.binfbnx" in file_path:
+#        table_offset = 0xA0
+#        lod0_offset =
+        
+    if "leadpipe_default_publish.binfbx" in file_path:
+        table_offset = 0x353
+        lod0_offset = 0xE685
+        
+    if "flashbang_default_publish.binfbx" in file_path:
+        table_offset = 0x68D
+        lod0_offset = 0x70C
+        
+    if "casey_pistol_default_publish.binfbx" in file_path:
+        table_offset = 0xB09
+        lod0_offset = 0xB8C
+        
+    if "crossbow_default_publish.binfbx" in file_path:
+        table_offset = 0x1D86
+        lod0_offset = 0x1FF5
+
+    if "crossbow_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2CFC
+        lod0_offset = 0x2F6B
+        
+    if "crossbow_double_publish_physx.binfbx" in file_path:
+        table_offset = 0x41B1
+        lod0_offset = 0x149E93
+        
+    if "doublebarrelshotgun_default_publish.binfbx" in file_path:
+        table_offset = 0x1478
+        lod0_offset = 0x1576
+
+    if "fbiservicepistol_compensator_publish.binfbx" in file_path:
+        table_offset = 0x573
+        lod0_offset = 0x5F2
+
+    if "fbiservicepistol_default_publish.binfbx" in file_path:
+        table_offset = 0xD12
+        lod0_offset = 0xE10
+
+    if "fbiservicepistol_magazine_extended_publish.binfbx" in file_path:
+        table_offset = 0x613
+        lod0_offset = 0x709
+    
+    if "flare_default_publish.binfbx" in file_path:
+        table_offset = 0x4DE
+        lod0_offset = 0x561
+        
+    if "flaregun_default_publish.binfbx" in file_path:
+        table_offset = 0x6ED
+        lod0_offset = 0x76C
+
+    if "flashlight_default_publish.binfbx" in file_path:
+        table_offset = 0x1920D
+        lod0_offset = 0x193F1
+        mesh_skeleton_offset = 0x18C4C
+
+    if "lamp_default_publish.binfbx" in file_path:
+        table_offset = 0x40E
+        lod0_offset = 0x5F2
+
+    if "lamp_physx.binfbx" in file_path:
+        table_offset = 0x94A
+        lod0_offset = 0xB3E
+        
+    if "nightingale_treeweapon.binfbx" in file_path:
+        table_offset = 0x426
+        lod0_offset = 0x82CB4
+        
+    if "pumpactionshotgun_compensator_publish.binfbx" in file_path:
+        table_offset = 0x96C
+        lod0_offset = 0x9EB
+
+    if "pumpactionshotgun_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2442
+        lod0_offset = 0x25BB
+
+    if "pumpactionshotgun_stock_pouch_publish.binfbx" in file_path:
+        table_offset = 0x8A4
+        lod0_offset = 0x923
+
+    if "revolver_default_publish.binfbx" in file_path:
+        table_offset = 0x1517
+        lod0_offset = 0x160D
+
+    if "rifle_cheek_pad_publish.binfbx" in file_path:
+        table_offset = 0xF75
+        lod0_offset = 0x1073
+
+    if "rifle_default_publish.binfbx" in file_path:
+        table_offset = 0x1536
+        lod0_offset = 0x1634
+
+    if "rifle_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2471
+        lod0_offset = 0x256F
+
+    if "rifle_scope_publish.binfbx" in file_path:
+        table_offset = 0xF75
+        lod0_offset = 0x106B
+
+    if "sawnoffshotgun_default_publish.binfbx" in file_path:
+        table_offset = 0x1514
+        lod0_offset = 0x1612
+
+    if "sawnoffshotgun_physx.binfbx" in file_path:
+        table_offset = 0x260B
+        lod0_offset = 0x2709
+
+    if "abigail_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2efe6
+        lod0_offset = 0xb30aae
+
+    if "ahti_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x379ef
+        lod0_offset = 0x5cb9dd
+
+    if "alan_brightfalls_noplaid_publish_physx.binfbx" in file_path:
+        table_offset = 0x253f9
+        lod0_offset = 0x20df985
+
+    if "alan_brightfalls_publish_physx.binfbx" in file_path:
+        table_offset = 0x303f2
+        lod0_offset = 0x218e521
+
+    if "alan_default_dirty_01_publish_physx.binfbx" in file_path:
+        table_offset = 0x2f5ff
+        lod0_offset = 0x2356e64
+
+    if "alan_default_dirty_02_no_satchel_publish_physx.binfbx" in file_path:
+        table_offset = 0x33bde
+        lod0_offset = 0x10188b4
+
+    if "alan_default_dirty_02_publish_physx.binfbx" in file_path:
+        table_offset = 0x351a5
+        lod0_offset = 0x10da56d
+
+    if "alan_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2f5f3
+        lod0_offset = 0x232566a
+
+    if "alan_no_satchel_publish_physx.binfbx" in file_path:
+        table_offset = 0x2e028
+        lod0_offset = 0x2288458
+
+    if "alan_scratch_player_publish_physx.binfbx" in file_path:
+        table_offset = 0x2efcc
+        lod0_offset = 0x81A524
+
+    if "alan_wake_scratch_publish_physx.binfbx" in file_path:
+        table_offset = 0x6a541f
+        lod0_offset = 0x24ea0b5
+        mesh_skeleton_offset = 0x678968
+
+    if "alex_casey_dark_place_publish_physx.binfbx" in file_path:
+        table_offset = 0x2c6f4
+        lod0_offset = 0x1b6307e
+
+    if "alex_casey_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2d08d
+        lod0_offset = 0x1eccaa0
+
+    if "alex_casey_suit_publish.binfbx" in file_path:
+        table_offset = 0x22e5f
+        lod0_offset = 0x1B59BE2
+
+    if "alex_casey_suit_rough_publish_physx.binfbx" in file_path:
+        table_offset = 0x26f90
+        lod0_offset = 0x628DAC
+
+    if "charlie_koskela_mascot_publish_physx.binfbx" in file_path:
+        table_offset = 0x223c2
+        lod0_offset = 0x2aae00
+
+    if "charline_koskela_mascot_publish_physx.binfbx" in file_path:
+        table_offset = 0x226c3
+        lod0_offset = 0x2955a9
+
+    if "cynthia_weaver_dead_publish_physx.binfbx" in file_path:
+        table_offset = 0x440ab
+        lod0_offset = 0xf0d180
+
+    if "cynthia_weaver_sweater_publish_physx.binfbx" in file_path:
+        table_offset = 0x2e966
+        lod0_offset = 0xbd7938
+
+    if "deputy_mulligan_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x26411
+        lod0_offset = 0xbc6e74
+
+    if "deputy_mulligan_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x26ade
+        lod0_offset = 0xb64576
+
+    if "deputy_mulligan_guardian_publish_physx.binfbx" in file_path:
+        table_offset = 0x237e7
+        lod0_offset = 0xf45a19
+        mesh_skeleton_offset = 0x539e70
+
+    if "deputy_thorton_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x2b112
+        lod0_offset = 0x1039915
+
+    if "deputy_thorton_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2b24d
+        lod0_offset = 0xf9f308
+
+    if "deputy_thorton_guardian_publish_physx.binfbx" in file_path:
+        table_offset = 0x569ddc
+        lod0_offset = 0x1920a21
+
+    if "donna_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x241a8
+        lod0_offset = 0xa42115
+
+    if "ed_booker_deerfest_publish_physx.binfbx" in file_path:
+        table_offset = 0x2cfb2
+        lod0_offset = 0x74ff4b
+
+    if "ed_booker_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x42c370
+        lod0_offset = 0xa9b16a
+        mesh_skeleton_offset = 0x3ff308
+        
+    if "enemy_m_fadeout_01_publish.binfbx" in file_path:
+        table_offset = 0x1F9C9
+        lod0_offset = 0x3034C9
+        
+    if "ilmo_koskela_bikergang_publish_physx.binfbx" in file_path:
+        table_offset = 0x2594e
+        lod0_offset = 0x68d545
+
+    if "ilmo_koskela_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x3ba099
+        lod0_offset = 0xafa914
+        mesh_skeleton_offset = 0x3911a0
+
+    if "ilmo_koskela_deerfest_publish_physx.binfbx" in file_path:
+        table_offset = 0x25801
+        lod0_offset = 0x9e9c96
+
+    if "jaakko_koskela_bikergang_publish_physx.binfbx" in file_path:
+        table_offset = 0x2f92b
+        lod0_offset = 0xd1080f
+
+    if "jaakko_koskela_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x454c4e
+        lod0_offset = 0x10076b9
+        mesh_skeleton_offset = 0x42b998
+
+    if "kiran_estevez_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2ab4c
+        lod0_offset = 0x97e866
+
+    if "kiran_estevez_healed_publish.binfbx" in file_path:
+        table_offset = 0x254d7
+        lod0_offset = 0x970eaf
+
+    if "kiran_estevez_wounded_jacket_publish_physx.binfbx" in file_path:
+        table_offset = 0x2ab44
+        lod0_offset = 0x4E94AA
+
+    if "kiran_estevez_wounded_publish.binfbx" in file_path:
+        table_offset = 0x2549f
+        lod0_offset = 0x94af5a
+
+    if "mandy_may_nursinghome_publish_physx.binfbx" in file_path:
+        table_offset = 0x26357
+        lod0_offset = 0x9f24d5
+        
+    if "nightingale_guardian_publish.binfbx" in file_path:
+        table_offset = 0x20494
+        lod0_offset = 0x101707D
+        
+    if "norman_deerfest_publish.binfbx" in file_path:
+        table_offset = 0x2069d
+        lod0_offset = 0x8aa9d7
+
+    if "norman_default_publish.binfbx" in file_path:
+        table_offset = 0x239d4
+        lod0_offset = 0x76fee3
+
+    if "odin_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x24487
+        lod0_offset = 0x87b739
+
+    if "odin_rocker_publish_physx.binfbx" in file_path:
+        table_offset = 0x296d2
+        lod0_offset = 0x8c35c5
+
+    if "pat_maine_default_publish.binfbx" in file_path:
+        table_offset = 0x23c97
+        lod0_offset = 0x828564
+
+    if "rose_marigold_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x32a33
+        lod0_offset = 0xd96181
+
+    if "rose_marigold_nursinghome_publish_physx.binfbx" in file_path:
+        table_offset = 0x2d0ff
+        lod0_offset = 0xd1b5ed
+
+    if "saga_alt_publish_physx.binfbx" in file_path:
+        table_offset = 0x40ed2
+        lod0_offset = 0x19990ED
+
+    if "saga_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x3e394
+        lod0_offset = 0x16E23CC
+
+    if "saga_no_jacket_publish_physx.binfbx" in file_path:
+        table_offset = 0x34e35
+        lod0_offset = 0x18f6e73
+
+    if "saga_raincoat_publish_physx.binfbx" in file_path:
+        table_offset = 0x40d66
+        lod0_offset = 0x158ac0c
+
+    if "steven_lin_default_publish.binfbx" in file_path:
+        table_offset = 0x24d73
+        lod0_offset = 0xb58c24
+
+    if "tammy_booker_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x25d85
+        lod0_offset = 0x50feb6
+
+    if "tammy_booker_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x3ebedd
+        lod0_offset = 0x8758c7
+        mesh_skeleton_offset = 0x3c6190
+
+    if "tim_breaker_darkplace_publish_physx.binfbx" in file_path:
+        table_offset = 0x286c3
+        lod0_offset = 0xd766e0
+
+    if "tim_breaker_sheriff_publish_physx.binfbx" in file_path:
+        table_offset = 0x2851d
+        lod0_offset = 0xb25aab
+
+    if "tor_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x2d8be
+        lod0_offset = 0xe73bad
+
+    if "vladimir_blum_cultist_publish_physx.binfbx" in file_path:
+        table_offset = 0x35b527
+        lod0_offset = 0x83b7ea
+        mesh_skeleton_offset = 0x3330b8
+
+    if "vladimir_blum_default_publish_physx.binfbx" in file_path:
+        table_offset = 0x243a2
+        lod0_offset = 0xaaed1d
 
 
     # Auxiliary functions\
@@ -446,24 +446,6 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         length = read_long(file) - 1
         string = file.read(length).decode('utf-8')
         return string, length
-    
-    def find_byte_sequence(file, byte_sequence):
-        byte_data = file.read()
-
-        # Convert the byte sequence into a list of integers
-        byte_sequence_int = [int(byte, 16) for byte in byte_sequence.split()]
-
-        # Search for the byte sequence
-        index = byte_data.find(bytes(byte_sequence_int))
-
-        return index
-
-    def read_value_at_offset(file, offset):
-        file.seek(offset)
-        value = file.read(1)
-        value = int.from_bytes(value, byteorder='little')
-
-        return value
 
 
     # Mesh info structure
@@ -489,75 +471,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
 
 
 
-    def find_offset(file):
-        lod_offsets = dict()
-        byte_sequence_1 = b"\x00\x01\x0F\x01\x00\x01\x07\x02"
-        total_entries = 0
-        
-        signature = read_long(file)
-        if signature != MAGIC_SIG:
-            print("Invalid file signature:", hex(signature))
-            return None
-        
-        file.seek(0)
-
-        byte_data = file.read()
-        
-        index = byte_data.find(byte_sequence_1)
-        
-        if index != -1:
-            # Jump 54 bytes back and read the value
-            offset_54 = index - 54
-            value_54 = read_value_at_offset(file, offset_54)
-            
-            if value_54 > 5:
-                total_entries += 1
-                print("\ntable_offset:", hex(offset_54), "count:", value_54, "\n")
-            else:
-                # Jump 84 bytes back and read the value
-                offset_84 = index - 84
-                value_84 = read_value_at_offset(file, offset_84)
-                print("\ntable_offset:", hex(offset_84), "count:", value_84, "\n")
-                total_entries += 1
-        
-        if total_entries == 0:
-            print("\nByte sequence not found.")
-        table_offset = offset_84
-        mesh_infos, cur_offset = read_mesh_data(file, table_offset)
-        
-        lod_offset = cur_offset + 4
-        lod = mesh_infos[0].lodId
-        # Search function for the second byte sequence
-        byte_sequence_2 = b"\x00\x00\x00\x02\x00\x00\x00"
-        consecutive_bytes = 12
-        offset_shift = 7
-        print("Possible offsets:")    
-        index = byte_data.find(byte_sequence_2)
-        
-                    
-        while index != -1:
-            # Check the following bytes
-            consecutive_values = byte_data[index + len(byte_sequence_2):index + len(byte_sequence_2) + consecutive_bytes]
-            if lod == mesh_infos[0].lodId:
-                print(f"lod{lod}_offset: {hex(lod_offset)}")
-                lod_offsets[lod] = lod_offset
-                lod -= 1
-            if not any(byte == 0 for byte in consecutive_values):
-                if lod != mesh_infos[0].lodId and lod >= 0:
-                    offset_shifted = index + offset_shift
-                    print(f"lod{lod}_offset: {hex(offset_shifted)}")
-                    lod_offsets[lod] = offset_shifted
-                    lod -= 1
-            
-            # Search for the next occurrence of the byte sequence
-            index = byte_data.find(byte_sequence_2, index + 1)
     
-        if index == -1:
-            print("\nByte sequence not found.")
-            
-        print(f"LOD Offsets: {lod_offsets}")
-        return mesh_infos, lod_offsets
-            
     # Read mesh data for mesh info structure
     def read_mesh_data(file, table_offset):
         mesh_infos = []
@@ -606,9 +520,9 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
             else:
                 file.seek(cur_offset + block_offset, 0)
             mesh_infos.append(MeshInfo(lodId, vertCount, faceCount, byteForFace, face_offset, name, bonesPerVertex, bbox, vertex_size))
+
         
-        cur_offset = file.tell()
-        return mesh_infos, cur_offset
+        return mesh_infos
 
     # Function for outputting mesh info structure (console)
     def print_mesh_infos(mesh_infos):
@@ -1005,11 +919,8 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         objArray = []
         msh = -1
         verts = 0
-        
         with open(file_path, "rb") as file:     
-            mesh_infos, lod_offsets = find_offset(file)
-            target_lod = mesh_infos[0].lodId
-            lod_offset = lod_offsets[mesh_infos[0].lodId]
+            mesh_infos = read_mesh_data(file, table_offset)
             print_mesh_infos(mesh_infos)
 
             for mesh_info in mesh_infos:
@@ -1029,7 +940,7 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
                     msh += 1
                     vrtwgt = None
 #                            for n in range(i)
-                    uv_offset = lod_offset + HEADER_SIZE
+                    uv_offset = lod0_offset + HEADER_SIZE
                     vertex_offset = (uv_offset + (mesh_info.vertCount * UV_SIZE) - HEADER_SIZE)
                     print(f"Vertex Size: {mesh_info.vertex_size}")
                     submeshvert_offset = vertex_offset + (verts * mesh_info.vertex_size)
