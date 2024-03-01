@@ -23,7 +23,7 @@ custom_icon_col = {}
 def import_binfbx(context, file_path, import_rig, file_structure, smooth):
     print("reading mesh...")
     
-    target_lod = 0  # Target LOD value
+    target_lod = 5  # Target LOD value
     
     if file_structure and import_rig:
         skel_path = file_path.replace('data_pc', 'data')
@@ -534,18 +534,19 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         print("Possible offsets:")    
         index = byte_data.find(byte_sequence_2)
         
+                    
         while index != -1:
             # Check the following bytes
             consecutive_values = byte_data[index + len(byte_sequence_2):index + len(byte_sequence_2) + consecutive_bytes]
+            if lod == mesh_infos[0].lodId:
+                print(f"lod{lod}_offset: {hex(lod_offset)}")
+                lod_offsets[lod] = lod_offset
+                lod -= 1
             if not any(byte == 0 for byte in consecutive_values):
                 if lod != mesh_infos[0].lodId and lod >= 0:
                     offset_shifted = index + offset_shift
                     print(f"lod{lod}_offset: {hex(offset_shifted)}")
                     lod_offsets[lod] = offset_shifted
-                    lod -= 1
-                if lod == mesh_infos[0].lodId:
-                    print(f"lod{lod}_offset: {hex(lod_offset)}")
-                    lod_offsets[lod] = lod_offset
                     lod -= 1
             
             # Search for the next occurrence of the byte sequence
@@ -1004,9 +1005,11 @@ def import_binfbx(context, file_path, import_rig, file_structure, smooth):
         objArray = []
         msh = -1
         verts = 0
+        
         with open(file_path, "rb") as file:     
             mesh_infos, lod_offsets = find_offset(file)
-            lod_offset = lod_offsets[target_lod]
+            target_lod = mesh_infos[0].lodId
+            lod_offset = lod_offsets[mesh_infos[0].lodId]
             print_mesh_infos(mesh_infos)
 
             for mesh_info in mesh_infos:
